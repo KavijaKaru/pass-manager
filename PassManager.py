@@ -2,6 +2,7 @@ import pyglet
 import tkinter
 
 pyglet.font.add_file('font 1.ttf')
+pyglet.font.add_file('font 2.otf')
 pyglet.font.add_file('font 3.otf')
 
 
@@ -9,12 +10,11 @@ class Master:
 
     def __init__(self):
         self.master = tkinter.Tk()
-        self.master.geometry("300x432+600+200")
+        self.master.geometry("415x432+600+200")
         self.master.title("PassManager")
+        self.master.resizable(False, False)
         self._frame = None
-        backgroundImg = tkinter.PhotoImage(file="background.png")
-        self.background = backgroundImg
-        self.switch_frame(StartPage(self, self.master, self.background))
+        self.switch_frame(StartPage(self, self.master))
 
     def run_main_loop(self):
         self.master.mainloop()
@@ -57,75 +57,81 @@ class Database:
             return outputString
 
 
-def StartPage(in_self, root, img):
-    frame = tkinter.Frame(root, relief='sunken', background="#CD6155" )
-    tkinter.Label(frame, image=img).place(relwidth=1, relheight=1)
+def StartPage(in_self, root):
+    frame = tkinter.Frame(root, relief='sunken', background='#A44242')
     data = Database()
     if data.database_check():
-        tkinter.Label(frame, text="Welcome Back!", font="{Stabillo Medium} 40", fg="white", background="purple").grid \
-            (row=0, column=0, columnspan=2)
-        tkinter.Label(frame, text="Master Password ", background='#806ce9', font="MOMCAKE").grid(row=2, column=0)
-        masterPass = tkinter.Entry(frame, background='#806ce9', relief='groove', borderwidth=5, font="MOMCAKE")
-        masterPass.grid(row=3, column=0)
+        tkinter.Label(frame, text="Welcome Back!", font="{Stabillo Medium} 40", fg="white", background='#A44242').\
+            grid(row=0, column=0, columnspan=2, pady=10)
+        tkinter.Label(frame, text="Master Password ", background='#A44242', font="MOMCAKE 25", fg="white").\
+            grid(row=2, column=0)
+        masterPass = tkinter.Entry(frame, background='#A44242', font="ABeeZee 25", fg="white",
+                                   relief='groove', borderwidth=5)
+        masterPass.grid(row=3, column=0, pady=15)
 
         def CheckPass():
             with open("database.txt", "r") as db:
                 content = db.readline().strip("\n")
-                if content == masterPass.get():
+                if content == "Master Key: " + masterPass.get():
                     in_self.switch_frame(showPage(in_self, root))
                 else:
-                    tkinter.Label(frame, text="Please try again :(").grid(row=4, column=0)
+                    tkinter.Label(frame, text="Please try again :(", background='#A44242', font="MOMCAKE 25", fg="white").\
+                        grid(row=4, column=0, pady=10)
 
-        tkinter.Button(frame, text="OK", background='#806ce9', font="MOMCAKE", command=CheckPass).grid(row=5, column=0)
+        tkinter.Button(frame, width=10, text="OK", background='#A44242', font="MOMCAKE 25", fg="white", command=CheckPass).\
+            grid(row=5, column=0)
 
     else:
-        tkinter.Label(frame, text="Get Started!", font="{Stabillo Medium} 50", fg="white", background="#9B59B6").grid \
-            (row=0, column=2)
-        tkinter.Button(frame, text="Create Account", background='#806ce9', font="MOMCAKE", command=lambda:
-        in_self.switch_frame(GetStarted(in_self, root, img))).grid(row=1, column=2)
+        tkinter.Label(frame, text="Get Started!", font="{Stabillo Medium} 50", fg="white", background='#A44242').grid \
+            (row=0, column=0, columnspan=2, padx=75)
+        tkinter.Button(frame, text="Create Account", font="{Stabillo Medium} 30", fg="white", background='#A44242', command=lambda:
+        in_self.switch_frame(GetStarted(in_self, root))).grid(row=1, column=0, pady=80, padx=80)
 
     return frame
 
 
-def GetStarted(in_self, root, img):
-    frame = tkinter.Frame(root, relief='sunken', background='gray')
-    tkinter.Label(frame, image=img).place(relwidth=1, relheight=1)
-    tkinter.Label(frame, text="Name").grid(row=1, column=1)
-    tkinter.Entry(frame).grid(row=2, column=1)
-    tkinter.Label(frame, text="New Master Password").grid(row=3, column=1)
-    store_master = tkinter.Entry(frame)
+def GetStarted(in_self, root):
+    frame = tkinter.Frame(root, relief='sunken', background='#A44242')
+    tkinter.Label(frame, text="Name", font="{Stabillo Medium} 40", fg="white", background='#A44242').grid(row=1, column=1)
+    tkinter.Entry(frame, background='#A44242', font="ABeeZee 25", fg="white").grid(row=2, column=1)
+    tkinter.Label(frame, text="New Master Password", font="{Stabillo Medium} 40", fg="white", background='#A44242').grid(row=3, column=1)
+    store_master = tkinter.Entry(frame, background='#A44242', font="ABeeZee 25", fg="white")
     store_master.grid(row=4, column=1)
-    tkinter.Button(frame, text="Save", command=lambda: store_and_redirect()).grid(row=5, column=1)
+    tkinter.Button(frame, text="Save", font="{Stabillo Medium} 40", fg="white", background='#A44242', command=lambda: store_and_redirect()).grid(row=5, column=1)
 
     def store_and_redirect():
         with open("database.txt", "a") as db:
-            print(store_master.get(), file=db)
-        in_self.switch_frame(StartPage(in_self, root, img))
+            print("Master Key: " + store_master.get(), file=db)
+        in_self.switch_frame(StartPage(in_self, root))
 
     return frame
 
 
 def showPage(in_self, root):
-    frame = tkinter.Frame(root, relief='sunken', background='gray')
-    # frame.rowconfigure(0, weight=100000)
-    # frame.rowconfigure(1, weight=100)
-    show_text = tkinter.Text(root, height=20, font="{Stabillo Medium}")
+    frame = tkinter.Frame(root, relief='sunken', background='#A44242')
+    show_text = tkinter.Text(root, height=15, width=34, font="ABeeZee 15", fg="white", background='#A94949'
+                             , borderwidth=3)
     show_text.grid(row=1, column=0)
     DataBase = Database()
     show_text.insert(tkinter.END, DataBase.viewContent())
-    tkinter.Button(root, text="Add Password", command=lambda: in_self.switch_frame(AddPass(in_self, root))).grid(row=2, column=0, sticky="sw")
+    tkinter.Button(root, text="Add Password", font="{Stabillo Medium} 30", fg="white", background='#A44242',
+                   command=lambda: in_self.switch_frame(AddPass(in_self, root))).grid\
+        (row=2, column=0, sticky="sw")
     return frame
 
 
 def AddPass(in_self, root):
-    frame = tkinter.Frame(root, relief='sunken', background='gray')
-    tkinter.Label(frame, text="Platform").grid(row=0, column=0)
-    plat = tkinter.Entry(frame)
-    plat.grid(row=1, column=0)
-    tkinter.Label(frame, text="Password").grid(row=2, column=0)
-    _pass = tkinter.Entry(frame)
-    _pass.grid(row=3, column=0)
-    tkinter.Button(frame, text="Save", command=lambda: addPassFunc()).grid(row=4, column=0)
+    frame = tkinter.Frame(root, relief='sunken', background='#A44242')
+    tkinter.Label(frame, text="Platform", font="{Stabillo Medium} 40", fg="white", background='#A44242').\
+        grid(row=0, column=0)
+    plat = tkinter.Entry(frame, background='#A44242', font="ABeeZee 25", fg="white")
+    plat.grid(row=1, column=0, pady=10)
+    tkinter.Label(frame, text="Password", font="{Stabillo Medium} 40", fg="white", background='#A44242').\
+        grid(row=2, column=0, pady=10)
+    _pass = tkinter.Entry(frame, background='#A44242', font="ABeeZee 25", fg="white")
+    _pass.grid(row=3, column=0, pady=10)
+    tkinter.Button(frame, width=10, text="Save", font="{Stabillo Medium} 30", fg="white", background='#A44242',
+                   command=lambda: addPassFunc()).grid(row=4, column=0, pady=10)
 
     def addPassFunc():
         data = Database()
